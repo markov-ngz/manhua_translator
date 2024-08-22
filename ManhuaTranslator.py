@@ -1,16 +1,16 @@
-from manhua_translator.KoreanExtractor import KoreanExtractor
+from ComicExtractor import ComicExtractor
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np 
 import math
 
-class ManhuaTranslator(KoreanExtractor):
+class ManhuaTranslator(ComicExtractor):
 
-    def __init__(self, sam_model: str, sam_processor: str, translator_name: str, device: str = "cpu") -> None:
-        super().__init__(sam_model, sam_processor, translator_name, device)
+    def __init__(self, sam_model: str, sam_processor: str, translator_name: str,lang="kor" ,device: str = "cpu") -> None:
+        super().__init__(sam_model, sam_processor, translator_name, lang, device)
 
     def manhua_translator(self,image_PIL:Image,save_path:str, input_boxes:list, input_point:np.array,):
         # Extract the texts 
-        texts = self.extract_korean(image_PIL,input_boxes,input_point)
+        texts = self.extract_text(image_PIL,input_boxes,input_point)
 
         image_inpainted = self.write_all_texts(texts,image_PIL)
 

@@ -6,16 +6,17 @@ import numpy as np
 import math 
 import cv2
 
-class KoreanExtractor():
+class ComicExtractor():
 
 
-    def __init__(self,sam_model:str,sam_processor:str,translator_name:str,device:str = "cpu") -> None:
+    def __init__(self,sam_model:str,sam_processor:str,translator_name:str,lang:str,device:str = "cpu") -> None:
         """
         
         """
 
         self.load_model(sam_model,sam_processor,translator_name)
         self.device = device
+        self.lang = lang
 
     def load_model(self,sam_model:str,sam_processor:str,translator_name:str)->None:
         """Load Model from local path"""
@@ -24,7 +25,7 @@ class KoreanExtractor():
         self.sam_processor = SamProcessor.from_pretrained(sam_processor,local_files_only=True)
         self.translator = pipeline("translation", model=translator_name)
 
-    def extract_korean(self, image_PIL:Image,input_boxes:list, input_point:np.array)->dict:
+    def extract_text(self, image_PIL:Image,input_boxes:list, input_point:np.array)->dict:
         """
         From positions of text in the image, the image and the models
         Extract the text selected and translate it 
@@ -53,7 +54,7 @@ class KoreanExtractor():
             # pad again 
             padded_images  = self.paddings(images,images_shape, 0.1 )
             #extract the text 
-            line_text = self.predict_line(padded_images, config=r"--psm 11 --oem 3", confidence_score=40, lang="kor")
+            line_text = self.predict_line(padded_images, config=r"--psm 11 --oem 3", confidence_score=40, lang=self.lang)
 
             texts[i] = {}
             texts[i]["text"] = self.translate(line_text) # translated text

@@ -1,122 +1,146 @@
+import cv2
+from PIL import Image
+import numpy as np
+
 
 class GUI():
+
     def __init__(self) -> None:
-        pass
-
-def draw_text_within_boundary(image_original:Image, text:str, boundary_width:int, font_color:str="black",police:str="arial.ttf"):
-    """
-    From an image , 
-        a text, 
-        the original font_size ,
-        the max width, 
-        the  police
-    Return an image with the text written 
-    """
-
-
-    font_size = 100 
-
-    while font_size > 0 :
-
-        image = Image.fromarray(np.copy(np.array(image_original))).convert("RGB")
-        # PIL.Image -> PIL.ImageDraw
-        draw = ImageDraw.Draw(image)
-        
         # font 
-        font = ImageFont.truetype(police, font_size)
+        self.font = cv2.FONT_HERSHEY_SIMPLEX 
+        # org 
+        self.org = (50, 50) 
+        # fontScale 
+        self.fontScale = 1
+        # Green color in BGR 
+        self.color = (0, 255, 0) 
+        # Line thickness of 2 px 
+        self.thickness = 2
+        # Line type
+        self.line_type = cv2.LINE_AA
 
-        # Break the text into lines to fit within the boundary
-        lines = []
-        current_line = ""
+        # 1.3 Functions to save clicking positions
 
-        for word in text.split():
-            # add the word to the current line 
-            test_line = current_line + " " + word
-            # get the width of the text 
-            text_width = draw.textlength(test_line, font)
+        self.rectangle = []
+        self.rectangles = []
+        self.points = []        
+
+    def rectangle_clicks(self,event, x, y, flags, param):
+        """
+        """
+        if event == cv2.EVENT_LBUTTONDOWN:
+                self.rectangle.append(x)
+                self.rectangle.append(y)
+                # 4 coordinates of a rectangles => load them 
+                if len(self.rectangle) == 4:
+                    self.rectangles.append(self.rectangle)
+                    self.rectangle = []
+
+    def point_clicks(self,event, x, y, flags, param):
+            """
+            """
+
+            if event == cv2.EVENT_LBUTTONDOWN:
+                    self.points.append([x, y])
+
+    def get_inputs(self,path:str)->tuple:
+        """
+        From a given path image, trigger an interaction with the image to set the boxes and inputs 
+
+        Return image , input_boxes , input_point 
+            PIL.Image.Image , list, np.array
+        """
+        # image cv2 
+        image = cv2.imread(path) 
+        
+        # image PIL 
+        image_PIL = Image.open(path).convert("RGB")
+        
+        img_read = image.copy()
+
+        #--- 2. PROCEED -----------------------------------------------------------------------------------------------------
+
+
+        # Print indication
+        img_read = cv2.putText(img_read, 
+                               'Click 2x to draw,\'q\' to confirm', 
+                               self.org, 
+                               self.font,  
+                               self.fontScale, 
+                               self.color, 
+                               self.thickness, 
+                               self.line_type) 
+
+        # Displaying the image 
+        cv2.imshow('image', img_read) 
+
+        #---Rectangle Loop-----------------------------------------------------------------------------------------------
+        while True :
+            cv2.setMouseCallback('image', self.rectangle_clicks)
+            # waits for user to press key 'q' 
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
             
-            # if the width does not takes too much space
-            if text_width <= boundary_width:
-                # validate the line
-                current_line = test_line
-            else:
-                # if it is out of boundary, stop the line writing
-                lines.append(current_line.strip())
-                current_line = word
+        # closing all open windows 
+        cv2.destroyAllWindows() 
 
-        # add the last line
-        lines.append(current_line.strip())
+        # Drawing the rectangles on a new image
+        image_rec= image.copy()
 
-        # writing text
-        y_position = 0  # line height position 
-        for line in lines:
-            draw.text((0, y_position), line, font=font, fill=font_color)
-            y_position += font_size  # adjust as needed
-        if y_position < image.size[1] : 
-            return image# if the text does not go overboard in height
+        for rectangle in self.rectangles : 
+            x, y , z ,v = rectangle
+            image_rec = cv2.rectangle(image_rec,(x,y),(z,v), (0, 255, 0), 2)
 
-        font_size -=1
+        image_rec = cv2.putText(image_rec, 
+                               'Click 1x for the point the q ', 
+                               self.org, 
+                               self.font,  
+                               self.fontScale, 
+                               self.color, 
+                               self.thickness, 
+                               self.line_type) 
+        cv2.imshow('image_rec',image_rec)
 
-def write_text(texts:dict,idx:int, image:Image,police:str="arial.ttf") -> Image :
-    """
-    From : 
-      a dict with keys : ["text","coordinates","font_size"]
-      a PIL.Image RGB
-    Return the Image with the "text" written within "coordinates" of the "font_size"
-    """
-    #---A. SETUP------------------------------------------------------------------------------------------
-    # A.1. Unstack bounding box coordinates
-    y_min, y_max , x_min, x_max = texts[idx]["coordinates"]
+        #---Point's Loop-------------------------------------------------------------------------------------------------
 
-    # A.2. Copy original_image
-    image_cleaned = np.array(image)
+        while True :
+            cv2.setMouseCallback('image_rec', self.point_clicks)
+            # waits for user to press key 'q' 
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-    # A.3. Background color 
-    background_color = image_cleaned[y_min-1][x_min] 
+        for point in self.points:
+            x ,y = point
+            image_rec = cv2.circle(image_rec, (x,y), radius=2, color=(0, 255, 0), thickness=-1)
 
-    # A.4. Rectangle where the text will be written within
-    text_array = np.ones((y_max-y_min,x_max-x_min,3))*background_color
-    # np.array ((height, width,3), float64) -> np.array ((height, width,3), uint8) -> PIL.Image RGB
-    image_textual = Image.fromarray(text_array.astype("uint8"),"RGB")
+        cv2.destroyAllWindows() 
 
-    # A.5. Font Size
-    # get the font size used and diminish it by 10 % for the text to fit well 
-    font_size = texts[idx]["font_size"]  - math.ceil(texts[idx]["font_size"]*0.1)
+        image_rec = cv2.putText(image_rec, 
+                               'this is your choices', 
+                               self.org, 
+                               self.font,  
+                               self.fontScale, 
+                               self.color, 
+                               self.thickness, 
+                               self.line_type) 
 
-    # A.6. Font color 
-    # if the background is dark , write the text in white 
-    font_color = "black"
-    if background_color.max() < 101 : 
-        font_color = "white"
-    # A.7. Max width of the image
-    boundary_width = text_array.shape[1]
+        cv2.imshow('image_rec',image_rec)
 
-    #---B. WRITING-----------------------------------------------------------------------------------------
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-    # Image with drawn text
-    drawn_text = draw_text_within_boundary(image_textual, texts[idx]["text"], boundary_width,font_color,police=police)
+        confirm = input(" Confirmer votre choix ? [y/n]")
 
-    #---C. REPLACING------------------------------------------------------------------------------------------
-    # PIL.Image BW -> PIL.Image RGB -> np.array (height,width,3)
-    np_drawn_text_rgb = np.array(drawn_text.convert("RGB"))
+        confirm_drawings = False
 
-    # Replace the original text by the translated one 
-    image_cleaned[y_min:y_max , x_min : x_max] = np_drawn_text_rgb
+        if confirm == "y" or confirm == "Y":
+            confirm_drawings = True
 
-    # np.array ((height, width,3), uint8) -> PIL.Image RGB
-    new_image= Image.fromarray(image_cleaned,"RGB")
+        if confirm_drawings : 
+            input_point = np.array(self.points) # x, y 
+            # input_label = np.array([1 for i in range(len(points))])
+            input_boxes = [self.rectangles] #( x, y ), (z, w )
 
-    return new_image
-
-def write_all_texts(texts:dict,image:Image,police="arial.ttf")->Image:
-    """
-    From a dict with integer keys { 0: {"texts":,"coordinates":,"font_size": }}, the original image 
-    Return  an image with all the written text instead of the original ones
-    """
-    new_image = image
-    i=0
-
-    while i < len(texts):
-        new_image = write_text(texts,i, new_image,police=police)
-        i+=1
-    return new_image
+            return image_PIL , input_boxes, input_point
+        else : 
+             return None, None, None
