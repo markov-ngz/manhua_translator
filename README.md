@@ -1,13 +1,43 @@
 # manhua_translator
-Repository dedicated to the development of an automated mahnua translator
 
+Repository dedicated to the development of an automated mahnua translator.
 
+## 1. User Guide
 
+1- Install dependencies and run the script ```main.py```  <br>   <br>
+Your image will open up and you will be asked to draw a rectangle around your text : <br>
+2- Make 2 clicks ( left-high corner and bottom-right ) then press key 'q'  <br>  <br>
+A new image shall appear and your rectangle shall be drawn, now add the point input : <br>
+3- Make one click on the text , then press key 'q'  <br>  <br>
+The point shall appear :  <br>
+4- Press again 'q'  <br>  <br>
+The image shall close and you will be asked for confirmation through terminal output :  <br>
+5- Type 'yes' to continue  <br>  <br>
+Your image will then be processed.  <br>
+Your can retrieve your result to the path set by ```RESULT_PATH``` variable. 
+
+## 2. Environment Used 
+
+<b> Python version </b> : 3.11.4  <br>
+Set the following environment variables to match your configuration.
+```
+# Path of the image to translate
+IMAGE_PATH = 
+
+# Path where the result image will be stored
+RESULT_PATH = 
+
+# SAM's model & processor directory path 
+SAM_PATH = 
+SAM_PROCESSOR = 
+
+# Translation model to use the pipeline ( value "Helsinki-NLP/opus-mt-ko-en" ) 
+TRANSLATOR_NAME =
+```
 
 <hr>
 
-##  Resource's reference : 
-
+##  3. Resource's reference : 
 
 ### Segmentation Anything model : 
 ```
@@ -39,7 +69,6 @@ Repository dedicated to the development of an automated mahnua translator
 hugging face : https://huggingface.co/Helsinki-NLP/opus-mt-ko-en
 
 ### Tesseract-OCR :
-
-repository : https://github.com/tesseract-ocr/tesseract 
-license : https://github.com/tesseract-ocr/tesseract/blob/main/LICENSE 
-
+- repository : https://github.com/tesseract-ocr/tesseract 
+- license : https://github.com/tesseract-ocr/tesseract/blob/main/LICENSE 
+!! : in order to extract korean data, please make sure you have the language installed 
