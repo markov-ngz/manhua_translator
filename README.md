@@ -74,4 +74,9 @@ hugging face : https://huggingface.co/Helsinki-NLP/opus-mt-ko-en
 ### Tesseract-OCR :
 - repository : https://github.com/tesseract-ocr/tesseract 
 - license : https://github.com/tesseract-ocr/tesseract/blob/main/LICENSE 
-!! : in order to extract korean data, please make sure you have the language installed 
+!! : in order to extract korean data, please make sure you have the language installed
+
+## 5. Cite and share 
+Please add the license to your work or add a star to the repository 😊 
+It would really help my career ! 
+
