@@ -19,6 +19,9 @@ Your can retrieve your result to the path set by ```RESULT_PATH``` variable.
 
 Example : 
 
+<img src="example.png" width=80%> <br>
+<b> source</b> : https://comic.naver.com/webtoon/list?titleId=746833&tab=sat <br>
+<b> reference</b> : season 2 , chapter 38 <br>
 
 Please adjust the font to your needs in the ManhuaTranslator.write_text method . 
 ## 2. Environment Used 
