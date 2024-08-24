@@ -2,6 +2,7 @@
 
 Repository dedicated to the development of an automated mahnua translator.
 
+
 ## 1. User Guide
 
 1- Install dependencies and run the script ```main.py```  <br>   <br>
@@ -16,6 +17,10 @@ The image shall close and you will be asked for confirmation through terminal ou
 Your image will then be processed.  <br>
 Your can retrieve your result to the path set by ```RESULT_PATH``` variable. 
 
+Example : 
+
+
+Please adjust the font to your needs in the ManhuaTranslator.write_text method . 
 ## 2. Environment Used 
 
 <b> Python version </b> : 3.11.4  <br>
@@ -37,10 +42,7 @@ TRANSLATOR_NAME =
 
 <hr>
 
-## 3. Example 
-
-
-##  4. Resource's reference : 
+##  3. Resource's reference : 
 
 ### Segmentation Anything model : 
 ```
@@ -76,7 +78,7 @@ hugging face : https://huggingface.co/Helsinki-NLP/opus-mt-ko-en
 - license : https://github.com/tesseract-ocr/tesseract/blob/main/LICENSE 
 !! : in order to extract korean data, please make sure you have the language installed
 
-## 5. Cite and share 
+## 4. Cite and share 
 Please add the license to your work or add a star to the repository 😊 
 It would really help my career ! 
 
