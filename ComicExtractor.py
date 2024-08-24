@@ -64,18 +64,24 @@ class ComicExtractor():
         return texts
 
 
-    def embed(self,image:Image):
+    def embed(self,image:Image)->Tensor:
         """
         Get the image's embedding
+        Return the embeddings of the image ( torch.Tensor ) 
         """
         inputs = self.sam_processor(image, return_tensors="pt").to(self.device)
         image_embeddings = self.sam.get_image_embeddings(inputs["pixel_values"])
-        print(type(image_embeddings))
+        
         return image_embeddings   
     
 
-    def segment(self,image:Image, image_embeddings, input_boxes:list, input_point:list):
-
+    def segment(self,image:Image, image_embeddings, input_boxes:list, input_point:list)->Tuple:
+        """
+        Segment the image 
+        Return : 
+        - masks : segmentation masks ( torch.Tensor ) 
+        - scores : confidence scores ( list ) 
+        """
         # preprocess the image with boxes 
         inputs = self.sam_processor(image, input_boxes=input_boxes,input_point=input_point, return_tensors="pt").to(self.device)
 
@@ -91,7 +97,7 @@ class ComicExtractor():
         masks = self.sam_processor.image_processor.post_process_masks(outputs.pred_masks.cpu(), inputs["original_sizes"].cpu(), inputs["reshaped_input_sizes"].cpu())
         # confidence scores
         scores = outputs.iou_scores
-        print(type(scores),type(masks))
+
         return masks, scores
     
     def get_mask(self,masks,idx:int)-> tuple :
